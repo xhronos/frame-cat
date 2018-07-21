@@ -52,6 +52,11 @@ function processArgs(args) {
 		}
 		if (options.error || options.printUsage) break;
 	}
+	if (!options.error && !options.printUsage) {
+		if (!options.inputFile) {
+			options.error = "no input file";
+		}
+	}
 	return options;
 }
 
