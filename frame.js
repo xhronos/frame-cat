@@ -78,27 +78,57 @@ function printUsage() {
 }
 
 function processFiles(options) {
-	return Promise.resolve(options)
-	.tap(getReferenceInfo)
-	// .tap(openFiles)
-	.then((info)=>{
-		console.log("DONE", info);
+	return Promise.resolve()
+	.then(() => getReferenceInfo(options))
+	.then(info => options.referenceInfo = info)
+	.then(() => getInputInfo(options))
+	.then(info => options.inputInfo = info)
+	.then(() => performChecks(options))
+	.then(getOutputStream(options))
+	.then(stream => options.outStream = stream)
+	.then(getInputStream(options))
+	.then(stream => options.inputStream = stream)
+	.then(()=>{
+		console.log("DONE", JSON.stringify(options,0,2));
 	});
 }
 
+function getInputStream(options) {
+	if (options.referenceFile && options.append) {
+		return fs.createWriteStream(options.referenceFile, {flags:'a'});
+	}
+	else {
+		return process.stdout;
+	}
+}
+
+function getOutputStream(options) {
+	if (options.referenceFile && options.append) {
+		return fs.createWriteStream(options.referenceFile, {flags:'a'});
+	}
+	else {
+		return process.stdout;
+	}
+}
 
 function getReferenceInfo(options) {
-	return Promise.resolve()
-	.then(()=>{
-		if (options.referenceFile) return getInfoFromFile(options.referenceFile);
-	 	return {
-			offset      : 0,
-			columnCount : null,
-		};
-	})
-	.then(info => {
-		console.log("info", info);
+	if (options.referenceFile) return getInfoFromFile(options.referenceFile);
+ 	return Promise.resolve({
+		offset      : 0,
+		columnCount : null,
 	});
+}
+
+function getInputInfo(options) {
+	return getInfoFromFile(options.inputFile, true);
+}
+
+function performChecks(options) {
+	if (options.referenceInfo.columnCount != null) {
+		if (options.referenceInfo.columnCount  !== options.inputInfo.columnCount) {
+			throw new Error(`expected input file to have columns count ${options.referenceInfo.columnCount}`);
+		}
+	}
 }
 
 const regexDigit = /[0-9]/;
