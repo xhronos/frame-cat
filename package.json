@@ -6,6 +6,9 @@
   "directories": {
     "test": "test"
   },
+  "bin": {
+    "frame-cat": "./bin/framecat"
+  },
   "scripts": {
     "test": "node_modules/jshint/bin/jshint . && node_modules/mocha/bin/mocha test"
   },
