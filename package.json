@@ -1,0 +1,30 @@
+{
+  "name": "frame-cat",
+  "version": "1.0.0",
+  "description": "concatenates frame data",
+  "main": "frame.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node_modules/jshint/bin/jshint . && node_modules/mocha/bin/mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/xhronos/frame-cat.git"
+  },
+  "keywords": [
+    "frames"
+  ],
+  "author": "Martin Lümkemann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xhronos/frame-cat/issues"
+  },
+  "homepage": "https://github.com/xhronos/frame-cat#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "jshint": "^2.9.5",
+    "mocha": "^5.2.0"
+  }
+}
