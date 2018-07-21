@@ -88,9 +88,53 @@ function processFiles(options) {
 	.then(stream => options.outStream = stream)
 	.then(getInputStream(options))
 	.then(stream => options.inputStream = stream)
+	.then(appendToStream(options))
 	.then(()=>{
 		console.log("DONE", JSON.stringify(options,0,2));
 	});
+}
+
+function appendToStream(options) {
+	const is = options.inputStream;
+	const os = options.outStream;
+	let buf = "";
+	const processBuf = processBufferForConcat(options, os);
+
+	return new Promise((resolve, reject) => {
+		os.on('error', e => {
+			is.destroy();
+			reject(e);
+		});
+		is.on('error', e => {
+			os.end();
+			reject(e);
+		});
+		is.on('close', () => {
+			try {
+				processBuf(buf, true);
+			}catch(e){
+				is.destroy(e);
+				return;
+			}
+			os.end();
+			resolve();
+		});
+		is.on('data', data => {
+			buf += data;
+			try {
+				buf = processBuf(buf);
+			}catch(e){
+				is.destroy(e);
+			}
+		});
+
+	});
+}
+
+function processBufferForConcat(options, outStream) { return buf => {
+	return "";
+};}
+
 }
 
 function getInputStream(options) {
