@@ -132,7 +132,9 @@ function appendToStream(options) {
 function processBufferForConcat(options, outStream) {
 	const offset = options.referenceInfo.offset + options.referenceInfo.delta;
 	const inputOffset = options.inputInfo.offset;
-	let c = 0;
+	if (!options.inputInfo.endsWithNewline) {
+		outStream.write('\n');
+	}
 	return (buf, last=false) => {
 		const lines = buf.split('\n');
 		const count = last || 0===lines.length || 0===lines[lines.length-1].length ?
@@ -148,10 +150,7 @@ function processBufferForConcat(options, outStream) {
 			const cols = line.split(',');
 			const t = parseFloat(cols.shift(1));
 			const tNew = round((t - inputOffset + offset));
-			if (c===0 || !options.inputInfo.endsWithNewline) {
-				outStream.write('\n');
-			}
-			c++;
+			cols.unshift(''+tNew);
 			outStream.write(cols.join(','));
 			if (cols[cols.length-1].length > 0) {
 				outStream.write('\n');
@@ -204,9 +203,9 @@ const regexDigit = /[0-9]/;
 
 function getInfoFromFile(file, onlyStartOffset=false) {
 	const info = {
-		offset      : 0,
+		offset      : null,
 		columnCount : null,
-		delta       : 0.001,
+		delta       : null,
 	};
 	const processBuf = processBufferForInfo(info, onlyStartOffset);
 
@@ -261,6 +260,7 @@ function processBufferForInfo(info, onlyStartOffset){ return (buf, last) => {
 			if (info.delta == null && info.offset != null) {
 				info.delta = t - info.offset;
 			}
+			info.offset = t;
 			if (onlyStartOffset) return true; // done
 		}
 		else {
