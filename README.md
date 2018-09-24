@@ -14,7 +14,7 @@ Usage
 
 The `frame-cat` tool can be used to concatenate frame data files.
 
-Example to concatenate `additional.txt` to `complete.txt`:
+Example for concatenate `additional.txt` to `complete.txt`:
 
 ```bash
 frame-cat -a -r complete.txt additional.txt
